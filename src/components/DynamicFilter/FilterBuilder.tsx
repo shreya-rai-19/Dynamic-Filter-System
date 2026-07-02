@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import {
   Box,
   Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Typography,
 } from "@mui/material";
 
@@ -15,6 +19,7 @@ import type { FilterRowData } from "../../types/filter";
 
 interface FilterBuilderProps {
   onFiltersChange: (filters: FilterRowData[]) => void;
+  onLogicChange: (logic: "AND" | "OR") => void;
 }
 
 const createFilter = (): FilterRowData => ({
@@ -26,21 +31,23 @@ const createFilter = (): FilterRowData => ({
 
 function FilterBuilder({
   onFiltersChange,
+  onLogicChange,
 }: FilterBuilderProps) {
   const [filters, setFilters] = useState<FilterRowData[]>([
     createFilter(),
   ]);
 
+  const [logic, setLogic] = useState<"AND" | "OR">("AND");
+
   useEffect(() => {
     onFiltersChange(filters);
-  }, [filters, onFiltersChange]);
+    onLogicChange(logic);
+  }, [filters, logic, onFiltersChange, onLogicChange]);
 
   const updateFilter = (updatedFilter: FilterRowData) => {
     setFilters((previousFilters) =>
       previousFilters.map((filter) =>
-        filter.id === updatedFilter.id
-          ? updatedFilter
-          : filter
+        filter.id === updatedFilter.id ? updatedFilter : filter
       )
     );
   };
@@ -54,26 +61,32 @@ function FilterBuilder({
 
   const deleteFilter = (id: string) => {
     setFilters((previousFilters) =>
-      previousFilters.filter(
-        (filter) => filter.id !== id
-      )
+      previousFilters.filter((filter) => filter.id !== id)
     );
   };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        mb: 3,
-      }}
-    >
-      <Typography
-        variant="h6"
-        gutterBottom
-      >
+    <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+      <Typography variant="h6" gutterBottom>
         Filters
       </Typography>
+
+      <Box sx={{ mb: 3, width: 200 }}>
+        <FormControl fullWidth>
+          <InputLabel>Match</InputLabel>
+
+          <Select
+            value={logic}
+            label="Match"
+            onChange={(e) =>
+              setLogic(e.target.value as "AND" | "OR")
+            }
+          >
+            <MenuItem value="AND">AND</MenuItem>
+            <MenuItem value="OR">OR</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       {filters.map((filter) => (
         <FilterRow

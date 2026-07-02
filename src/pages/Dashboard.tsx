@@ -19,8 +19,13 @@ function Dashboard() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FilterRowData[]>([]);
-  const filteredEmployees = filterEmployees(employees, filters);
+  const [logic, setLogic] = useState<"AND" | "OR">("AND");
 
+  const filteredEmployees = filterEmployees(
+    employees,
+    filters,
+    logic
+  );
   useEffect(() => {
     const loadEmployees = async () => {
       try {
@@ -72,7 +77,10 @@ function Dashboard() {
           <CircularProgress />
         </Box>
       ) : (<>
-        <FilterBuilder onFiltersChange={setFilters} />
+        <FilterBuilder
+          onFiltersChange={setFilters}
+          onLogicChange={setLogic}
+        />
         <EmployeeTable
           employees={filteredEmployees}
           loading={loading}

@@ -12,7 +12,8 @@ function getNestedValue(obj: unknown, path: string): unknown {
 
 export function filterEmployees(
   employees: Employee[],
-  filters: FilterRowData[]
+  filters: FilterRowData[],
+  logic: "AND" | "OR"
 ): Employee[] {
   const validFilters = filters.filter(
     (filter) =>
@@ -28,15 +29,17 @@ export function filterEmployees(
   }
 
   return employees.filter((employee) => {
-    return validFilters.every((filter) => {
+    const matches = (filter: FilterRowData) => {
       const employeeValue = getNestedValue(employee, filter.field);
       const filterValue = filter.value;
 
       switch (filter.operator) {
         case "equals":
         case "is":
-          return String(employeeValue).toLowerCase() ===
-            String(filterValue).toLowerCase();
+          return (
+            String(employeeValue).toLowerCase() ===
+            String(filterValue).toLowerCase()
+          );
 
         case "contains":
           return String(employeeValue)
@@ -73,6 +76,12 @@ export function filterEmployees(
         default:
           return true;
       }
-    });
+    };
+
+    if (logic === "AND") {
+      return validFilters.every(matches);
+    }
+
+    return validFilters.some(matches);
   });
 }
