@@ -38,3 +38,10 @@ export interface FilterFieldConfig {
   type: FieldType;
   options?: string[];
 }
+
+export interface FilterRowData {
+  id: string;
+  field: string;
+  operator: string;
+  value: unknown;
+}

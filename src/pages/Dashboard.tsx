@@ -11,10 +11,15 @@ import EmployeeTable from "../components/Table/EmployeeTable";
 import employeeService from "../services/employeeService";
 
 import type { Employee } from "../types/employee";
+import FilterBuilder from "../components/DynamicFilter/FilterBuilder";
+import type { FilterRowData } from "../types/filter";
+import { filterEmployees } from "../utils/filterEngine";
 
 function Dashboard() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<FilterRowData[]>([]);
+  const filteredEmployees = filterEmployees(employees, filters);
 
   useEffect(() => {
     const loadEmployees = async () => {
@@ -54,7 +59,7 @@ function Dashboard() {
         }}
       >
         <Typography variant="h6">
-          Total Employees: {employees.length}
+          Total Employees: {filteredEmployees.length} / {employees.length}
         </Typography>
       </Paper>
 
@@ -66,11 +71,13 @@ function Dashboard() {
         >
           <CircularProgress />
         </Box>
-      ) : (
+      ) : (<>
+        <FilterBuilder onFiltersChange={setFilters} />
         <EmployeeTable
-          employees={employees}
+          employees={filteredEmployees}
           loading={loading}
         />
+        </>
       )}
     </Box>
   );
